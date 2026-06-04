@@ -1,0 +1,146 @@
+#include <stdio.h>
+#include "../../vendor/raylib/include/raylib.h"
+
+#include "options.h"
+
+#include "../ui/slider.h"
+#include "../ui/label.h"
+
+#include "../core/game.h"
+#include "../core/scene.h"
+
+#include "../audio/audio.h"
+
+#include "gameplay.h"
+
+static Slider musicSlider;
+static Slider sfxSlider;
+
+static UILabel optionsLabel;
+static UILabel musicLabel;
+static UILabel musicPercentageLabel;
+static UILabel sfxLabel;
+static UILabel sfxPercentageLabel;
+static UILabel backLabel;
+
+static char musicPercentageText[5];
+static char sfxPercentageText[5];
+
+static int selected = 0;
+
+#define OPTION_MUSIC  0
+#define OPTION_SFX    1
+#define OPTION_BACK   2
+
+void SetSFXVolume(float value) {
+    SetSoundVolume(selectSfx, value / 100.0f);
+    SetSoundVolume(menuSfx, value / 100.0f);
+    PlaySound(selectSfx);
+}
+
+void OptionsInit() {
+    musicSlider = (Slider){
+        .rect = { 60, 140, 250, 20 },
+        .min = 0,
+        .max = 100,
+        .value = 100
+    };
+
+    sfxSlider = (Slider){
+        .rect = { 60, 240, 250, 20 },
+        .min = 0,
+        .max = 100,
+        .value = 100,
+        .onReleased = SetSFXVolume
+    };
+
+    UILabelInit(&optionsLabel, "OPTIONS", (Vector2){60, 40}, 40, WHITE);
+    UILabelInit(&musicLabel, "Music", (Vector2){60, 100}, 30, WHITE);
+    UILabelInit(&musicPercentageLabel, musicPercentageText, (Vector2){330, 132}, 20, GRAY);
+    UILabelInit(&sfxLabel, "SFX", (Vector2){60, 200}, 30, WHITE);
+    UILabelInit(&sfxPercentageLabel, sfxPercentageText, (Vector2){330, 232}, 20, GRAY);
+    UILabelInit(&backLabel, "Back", (Vector2){60, 340}, 30, WHITE);
+
+    snprintf(musicPercentageText, sizeof(musicPercentageText), "%d%%", musicSlider.value);
+    snprintf(sfxPercentageText, sizeof(musicPercentageText), "%d%%", sfxSlider.value);
+}
+
+void BackScene() {
+    selected = 0;
+    if (!is_gameplay) ChangeScene(SCENE_MENU);
+    else ChangeScene(SCENE_GAMEPLAY);
+    PlaySound(selectSfx);
+}
+
+void OptionsUpdate() {
+    SliderUpdate(&musicSlider);
+    SliderUpdate(&sfxSlider);
+
+    if (IsKeyPressed(KEY_DOWN)) {
+        selected++;
+        if (selected > OPTION_BACK) selected = 0;
+        PlaySound(menuSfx);
+    }
+    else if (IsKeyPressed(KEY_UP)) {
+        selected--;
+        if (selected < 0) selected = OPTION_BACK;
+        PlaySound(menuSfx);
+    }
+    else if (IsKeyPressed(KEY_ESCAPE)) BackScene();
+
+    switch(selected) {
+        case OPTION_MUSIC: {
+            if (IsKeyDown(KEY_RIGHT)) {
+                musicSlider.value++;
+                if (musicSlider.value > musicSlider.max) musicSlider.value = musicSlider.max;
+            } else if (IsKeyDown(KEY_LEFT)) {
+                musicSlider.value--;
+                if (musicSlider.value < musicSlider.min) musicSlider.value = musicSlider.min;
+            }
+
+            snprintf(musicPercentageText, sizeof(musicPercentageText), "%d%%", musicSlider.value);
+    
+            break;
+        }
+        case OPTION_SFX: {
+            if (IsKeyDown(KEY_RIGHT)) {
+                sfxSlider.value++;
+                if (sfxSlider.value > sfxSlider.max) sfxSlider.value = sfxSlider.max;
+            } else if (IsKeyDown(KEY_LEFT)) {
+                sfxSlider.value--;
+                if (sfxSlider.value < sfxSlider.min) sfxSlider.value = sfxSlider.min;
+
+            } else if (IsKeyReleased(KEY_LEFT) || IsKeyReleased(KEY_RIGHT)) SetSFXVolume(sfxSlider.value);
+
+            snprintf(sfxPercentageText, sizeof(musicPercentageText), "%d%%", sfxSlider.value);
+            break;
+        }
+        case OPTION_BACK: {
+            if (IsKeyPressed(KEY_ENTER)) BackScene();
+            break;
+        }
+    }
+}
+
+void OptionsDrawing() {
+    ClearBackground(BLACK);
+
+    UILabelDraw(&optionsLabel);
+
+    musicLabel.color = selected == OPTION_MUSIC ? YELLOW : WHITE;
+    UILabelDraw(&musicLabel);
+    SliderDraw(&musicSlider);
+    UILabelDraw(&musicPercentageLabel);
+
+    sfxLabel.color = selected == OPTION_SFX ? YELLOW : WHITE;
+    UILabelDraw(&sfxLabel);
+    SliderDraw(&sfxSlider);
+    UILabelDraw(&sfxPercentageLabel);
+
+    backLabel.color = selected == OPTION_BACK ? YELLOW : WHITE;
+    UILabelDraw(&backLabel);
+}
+
+void OptionsDeinit() {
+
+}
