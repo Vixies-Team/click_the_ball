@@ -30,7 +30,7 @@ void AssetsInit(const char* name_file) {
     }
 }
 
-Sound Assets_LoadAudio(const char* name_file) {
+Sound Assets_LoadSound(const char* name_file) {
     uint32_t size;
     void* data = VXPCK_ReadFile(assets, name_file, &size);
 
@@ -100,6 +100,17 @@ Font Assets_LoadFont(const char* name_file, int fontSize, const int *codepoints,
     free(data);
     
     return font;
+}
+
+void* Assets_LoadFile(const char* name_file, uint32_t* file_size) {
+    void* data = VXPCK_ReadFile(assets, name_file, file_size);
+
+    if (!IsValidData(data, *file_size)) {
+        ShowErrorDialog("File Load Failed\n\nFile missing or corrupted");
+        exit(0);
+    }
+
+    return data;
 }
 
 void AssetsUnload() {

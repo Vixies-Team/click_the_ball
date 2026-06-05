@@ -33,6 +33,8 @@ void GameInit() {
 }
 
 void GameUpdate() {
+    AudioUpdate();
+
     switch(currentScene) {
         case SCENE_INTRO: {
             IntroUpdate();
@@ -86,7 +88,6 @@ void GameDeinit() {
     AudioDeinit();
     IntroDeinit();
     MenuDeinit();
-    GameplayDeinit();
     OptionsDeinit();
     WindowDeinit();
 }

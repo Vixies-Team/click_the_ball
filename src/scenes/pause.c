@@ -12,9 +12,11 @@
 #include "../effects/fade.h"
 
 #include "../audio/audio.h"
+#include "../audio/audio_fade.h"
 
 #include "../scenes/gameplay.h"
 #include "../scenes/menu.h"
+#include "../scenes/options.h"
 
 #define MENU_SIZE 3
 static int selected = 0;
@@ -64,6 +66,7 @@ void PauseUpdate() {
                     break;
                 }
                 case 2: {
+                    AudioFadeStart(&musicFade, AUDIO_FADE_OUT, 1.5f, GetMusicVolume(), 0.0f);
                     FadeStart(&pauseFade, FADE_OUT, 1.5f, BLACK);
                     break;
                 }

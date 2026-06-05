@@ -4,6 +4,7 @@
 extern Sound selectSfx;
 extern Sound menuSfx;
 extern Sound shootSfx;
+extern Music songMusic;
 
 void AudioInit();
 void AudioUpdate();

@@ -6,7 +6,9 @@
 #include "../core/config.h"
 #include "../core/game.h"
 #include "../core/scene.h"
+
 #include "../audio/audio.h"
+#include "../audio/audio_fade.h"
 
 #include "../ui/label.h"
 
@@ -66,7 +68,6 @@ void MenuUpdate() {
             PlaySound(selectSfx);
             switch(selected) {
                 case 0: {
-                    GameplayInit();
                     FadeStart(&menuFade, FADE_OUT, 1.0f, BLACK);
                     break;
                 }   
@@ -83,7 +84,10 @@ void MenuUpdate() {
     }
     
     if (FadeUpdate(&menuFade) == FADE_EVENT_FINISHED && menuFade.mode == FADE_OUT) {
-        if (selected == 0) ChangeScene(SCENE_GAMEPLAY);
+        if (selected == 0) {
+            GameplayInit();
+            ChangeScene(SCENE_GAMEPLAY);
+        }
         else if (selected == 2) running = false;
     }
 }

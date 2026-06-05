@@ -36,6 +36,26 @@ OBJ = \
 	$(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC)) \
 	$(patsubst $(VENDOR_DIR)/%.c,$(OBJ_DIR)/vendor/%.o,$(VENDOR_SRC))
 
+DEBUG_CFLAGS = \
+	-Wall \
+	-Wextra \
+	-std=c99 \
+	-g3 \
+	-O0 \
+	-fsanitize=address \
+	-fsanitize=undefined
+
+DEBUG_LDFLAGS = \
+	-fsanitize=address \
+	-fsanitize=undefined
+
+debug: CFLAGS=$(DEBUG_CFLAGS)
+debug: LDFLAGS=$(DEBUG_LDFLAGS)
+debug: clean $(TARGET)
+
+debug-run: debug
+	ulimit -c unlimited && ./$(TARGET)
+
 all: $(TARGET)
 
 $(TARGET): $(OBJ)

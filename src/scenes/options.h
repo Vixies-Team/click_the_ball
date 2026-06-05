@@ -1,15 +1,13 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-typedef struct {
-    int music;
-    int sfx;
-} OptionsMenu;
-
 void OptionsInit();
 
 void OptionsUpdate();
 void OptionsDrawing();
+
+float GetSFXVolume();
+float GetMusicVolume();
 
 void OptionsDeinit();
 

@@ -76,6 +76,7 @@ void OptionsUpdate() {
         case SLIDER_EVENT_NONE: break;
         case SLIDER_EVENT_CLICKED: break;
         case SLIDER_EVENT_DRAGGED: {
+            SetMusicVolume(songMusic, musicSlider.value / 100.0f);
             snprintf(musicPercentageText, sizeof(musicPercentageText), "%d%%", musicSlider.value);
             break;
         };
@@ -86,7 +87,6 @@ void OptionsUpdate() {
         case SLIDER_EVENT_NONE: break;
         case SLIDER_EVENT_CLICKED: break;
         case SLIDER_EVENT_DRAGGED: {
-
             snprintf(sfxPercentageText, sizeof(sfxPercentageText), "%d%%", sfxSlider.value);
             break;
         };
@@ -118,6 +118,7 @@ void OptionsUpdate() {
                 if (musicSlider.value < musicSlider.min) musicSlider.value = musicSlider.min;
             }
             snprintf(musicPercentageText, sizeof(musicPercentageText), "%d%%", musicSlider.value);
+            SetMusicVolume(songMusic, musicSlider.value / 100.0f);
             break;
         }
         case OPTION_SFX: {
@@ -155,6 +156,14 @@ void OptionsDrawing() {
 
     backLabel.color = selected == OPTION_BACK ? YELLOW : WHITE;
     UILabelDraw(&backLabel);
+}
+
+float GetSFXVolume() {
+    return sfxSlider.value / 100.0f;
+}
+
+float GetMusicVolume() {
+    return musicSlider.value / 100.0f;
 }
 
 void OptionsDeinit() {

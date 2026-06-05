@@ -12,13 +12,17 @@
 #include "../core/config.h"
 
 #include "../platform/window.h"
+
 #include "../audio/audio.h"
+#include "../audio/audio_fade.h"
+
 #include "../entities/ball.h"
 #include "../utils/utils.h"
 #include "../ui/label.h"
 #include "../effects/fade.h"
 
 #include "../scenes/pause.h"
+#include "../scenes/options.h"
 
 #define BALL_COUNT 5
 
@@ -33,9 +37,12 @@ static UILabel scoreLabel;
 static UILabel highScoreLabel;
 static fade gameplayFade;
 
+AudioFade musicFade;
+
 void GameplayInit() {
     score = 0;
 
+    AudioFadeInit(&musicFade, AUDIO_TYPE_MUSIC, &songMusic);
     snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
     snprintf(highScoreText, sizeof(highScoreText), "High Score: %d", highScore);
 
@@ -47,81 +54,17 @@ void GameplayInit() {
     is_gameplay = true;
 
     FadeStart(&gameplayFade, FADE_IN, 1.0f, BLACK);
-
-    /*balls = (Ball*)malloc(5 * sizeof(Ball));
-    memset(balls, 0, 5 * sizeof(Ball));
-
-    for (int a = 0; a < 5; a++) {
-        Vector2 ballPos;
-        bool isBallPosValid = true;
-
-        do {
-            isBallPosValid = true;
-
-            ballPos = (Vector2){
-                (float)GetRandomValue(25, SCREEN_WIDTH - 25),
-                (float)GetRandomValue(75, SCREEN_HEIGHT - 25)
-            };
-
-            for (int b = 0; b < a; b++) {
-                float dx = ballPos.x - balls[b].position.x;
-                float dy = ballPos.y - balls[b].position.y;
-
-                float distanceSq = dx * dx + dy * dy;
-                float minDistance = 25 + balls[b].radius;
-
-                if (distanceSq < minDistance * minDistance) {
-                    isBallPosValid = false;
-                    break;
-                }
-            }
-        } while(!isBallPosValid);
-
-        BallInit(&balls[a], ballPos, 25, RED);
-        balls[a].velocity = (Vector2){ GetRandomFloat(-10.0f, 10.0f), GetRandomFloat(-10.0f, 10.0f) };
-    }*/
+    AudioFadeStart(&musicFade, AUDIO_FADE_IN, 1.0f, 0.0f, GetMusicVolume());
+    PlayMusicStream(songMusic);
 }
 
 void GameplayUpdate() {
     FadeUpdate(&gameplayFade);
+    AudioFadeUpdate(&musicFade);
+
     if (gameplayFade.active) return;
 
     if (!is_paused) {
-        /*for (int a = 0; a < BALL_COUNT; a++) {
-            if (balls[a].position.y - balls[a].radius <= 50) {
-                balls[a].velocity.y = fabsf(balls[a].velocity.y);
-            }
-            else if (balls[a].position.y + balls[a].radius >= SCREEN_HEIGHT) {
-                balls[a].velocity.y = -fabsf(balls[a].velocity.y);
-            }
-
-            if (balls[a].position.x - balls[a].radius <= 0) {
-                balls[a].velocity.x = fabs(balls[a].velocity.x);
-            }
-            else if (balls[a].position.x + balls[a].radius >= SCREEN_WIDTH) {
-                balls[a].velocity.x = -fabsf(balls[a].velocity.x);
-            }
-
-            for (int i = 0; i < BALL_COUNT; i++) {
-                for (int j = i + 1; j < BALL_COUNT; j++) {
-                    if (BallIsColliding(&balls[i], &balls[j])) BallBounce(&balls[i], &balls[j]);
-                }
-            }
-
-            switch(BallUpdate(&balls[a])) {
-                case BALL_EVENT_CLICKED: {
-                    PlaySound(shootSfx);
-                    score++;
-                    snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
-                    break;
-                }
-                case BALL_EVENT_NONE: {
-                    break;
-                }
-            }
-
-            WindowUpdate();
-        }*/
     } else PauseUpdate();
 
     if (IsKeyPressed(KEY_ESCAPE)) {
@@ -151,4 +94,5 @@ void GameplayDrawing() {
 void GameplayDeinit() { 
     is_gameplay = false;
     is_paused = false;
+    StopMusicStream(songMusic);
 }
