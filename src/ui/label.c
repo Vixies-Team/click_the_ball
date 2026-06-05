@@ -18,14 +18,13 @@ void UILabelInit(UILabel* label, const char* text, Vector2 position, int fontSiz
 
 void UILabelDraw(UILabel* label) {
     if (!label || !label->text) return;
-    Color color = Fade(label->color, label->alpha);
     DrawTextEx(
         label->font ? *label->font : GetFontDefault(),
         label->text,
         label->position,
         label->fontSize * label->scale,
         label->spacing,
-        color
+        Fade(label->color, label->alpha)
     );
 }
 

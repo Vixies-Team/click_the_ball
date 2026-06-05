@@ -3,6 +3,13 @@
 
 #include "../../vendor/raylib/include/raylib.h"
 
+typedef enum {
+    SLIDER_EVENT_NONE,
+    SLIDER_EVENT_CLICKED,
+    SLIDER_EVENT_DRAGGED,
+    SLIDER_EVENT_RELEASED
+} SliderEvent;
+
 typedef void (*SliderCallback)(float value);
 typedef struct {
     Rectangle rect;
@@ -12,12 +19,9 @@ typedef struct {
     int value;
 
     bool dragging;
-
-    SliderCallback onDrag;
-    SliderCallback onReleased;
 } Slider;
 
-void SliderUpdate(Slider *slider);
+SliderEvent SliderUpdate(Slider *slider);
 void SliderDraw(Slider *slider);
 
 #endif

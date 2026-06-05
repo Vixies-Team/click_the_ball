@@ -16,6 +16,7 @@
 #include "../entities/ball.h"
 #include "../utils/utils.h"
 #include "../ui/label.h"
+#include "../effects/fade.h"
 
 #include "../scenes/pause.h"
 
@@ -28,13 +29,26 @@ static char highScoreText[32];
 bool is_paused = false;
 bool is_gameplay = false;
 
-static Ball* balls = NULL;
-
 static UILabel scoreLabel;
 static UILabel highScoreLabel;
+static fade gameplayFade;
 
 void GameplayInit() {
-    balls = (Ball*)malloc(5 * sizeof(Ball));
+    score = 0;
+
+    snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
+    snprintf(highScoreText, sizeof(highScoreText), "High Score: %d", highScore);
+
+    UILabelInit(&scoreLabel, scoreText, (Vector2){20, 20}, 20, WHITE);
+    UILabelInit(&highScoreLabel, highScoreText, (Vector2){0, 0}, 20, WHITE);
+    highScoreLabel.position = (Vector2){SCREEN_WIDTH - UILabelMeasure(&highScoreLabel).x - 20, 20};
+
+    is_paused = false;
+    is_gameplay = true;
+
+    FadeStart(&gameplayFade, FADE_IN, 1.0f, BLACK);
+
+    /*balls = (Ball*)malloc(5 * sizeof(Ball));
     memset(balls, 0, 5 * sizeof(Ball));
 
     for (int a = 0; a < 5; a++) {
@@ -65,24 +79,15 @@ void GameplayInit() {
 
         BallInit(&balls[a], ballPos, 25, RED);
         balls[a].velocity = (Vector2){ GetRandomFloat(-10.0f, 10.0f), GetRandomFloat(-10.0f, 10.0f) };
-    }
-
-    score = 0;
-
-    snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
-    snprintf(highScoreText, sizeof(highScoreText), "High Score: %d", highScore);
-
-    UILabelInit(&scoreLabel, scoreText, (Vector2){20, 20}, 20, WHITE);
-    UILabelInit(&highScoreLabel, highScoreText, (Vector2){0, 0}, 20, WHITE);
-    highScoreLabel.position = (Vector2){SCREEN_WIDTH - UILabelMeasure(&highScoreLabel).x - 20, 20};
-
-    is_paused = false;
-    is_gameplay = true;
+    }*/
 }
 
 void GameplayUpdate() {
+    FadeUpdate(&gameplayFade);
+    if (gameplayFade.active) return;
+
     if (!is_paused) {
-        for (int a = 0; a < BALL_COUNT; a++) {
+        /*for (int a = 0; a < BALL_COUNT; a++) {
             if (balls[a].position.y - balls[a].radius <= 50) {
                 balls[a].velocity.y = fabsf(balls[a].velocity.y);
             }
@@ -114,7 +119,9 @@ void GameplayUpdate() {
                     break;
                 }
             }
-        }
+
+            WindowUpdate();
+        }*/
     } else PauseUpdate();
 
     if (IsKeyPressed(KEY_ESCAPE)) {
@@ -136,13 +143,12 @@ void GameplayDrawing() {
 
     DrawLine(0, 50, SCREEN_WIDTH, 50, WHITE);
 
-    for (int a = 0; a < 5; a++) BallDrawing(&balls[a]);
+    FadeDraw(&gameplayFade);
 
     if (is_paused) PauseDrawing();
 }
 
 void GameplayDeinit() { 
-    free(balls);
-    balls = NULL;
     is_gameplay = false;
+    is_paused = false;
 }

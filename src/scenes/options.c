@@ -51,7 +51,6 @@ void OptionsInit() {
         .min = 0,
         .max = 100,
         .value = 100,
-        .onReleased = SetSFXVolume
     };
 
     UILabelInit(&optionsLabel, "OPTIONS", (Vector2){60, 40}, 40, WHITE);
@@ -73,9 +72,30 @@ void BackScene() {
 }
 
 void OptionsUpdate() {
-    SliderUpdate(&musicSlider);
-    SliderUpdate(&sfxSlider);
+    switch(SliderUpdate(&musicSlider)) {
+        case SLIDER_EVENT_NONE: break;
+        case SLIDER_EVENT_CLICKED: break;
+        case SLIDER_EVENT_DRAGGED: {
+            snprintf(musicPercentageText, sizeof(musicPercentageText), "%d%%", musicSlider.value);
+            break;
+        };
+        case SLIDER_EVENT_RELEASED: break;
+    }
+    
+    switch(SliderUpdate(&sfxSlider)) {
+        case SLIDER_EVENT_NONE: break;
+        case SLIDER_EVENT_CLICKED: break;
+        case SLIDER_EVENT_DRAGGED: {
 
+            snprintf(sfxPercentageText, sizeof(sfxPercentageText), "%d%%", sfxSlider.value);
+            break;
+        };
+        case SLIDER_EVENT_RELEASED: {
+            SetSFXVolume(sfxSlider.value);
+            break;
+        };
+    }
+    
     if (IsKeyPressed(KEY_DOWN)) {
         selected++;
         if (selected > OPTION_BACK) selected = 0;
@@ -97,9 +117,7 @@ void OptionsUpdate() {
                 musicSlider.value--;
                 if (musicSlider.value < musicSlider.min) musicSlider.value = musicSlider.min;
             }
-
             snprintf(musicPercentageText, sizeof(musicPercentageText), "%d%%", musicSlider.value);
-    
             break;
         }
         case OPTION_SFX: {
@@ -109,10 +127,8 @@ void OptionsUpdate() {
             } else if (IsKeyDown(KEY_LEFT)) {
                 sfxSlider.value--;
                 if (sfxSlider.value < sfxSlider.min) sfxSlider.value = sfxSlider.min;
-
             } else if (IsKeyReleased(KEY_LEFT) || IsKeyReleased(KEY_RIGHT)) SetSFXVolume(sfxSlider.value);
-
-            snprintf(sfxPercentageText, sizeof(musicPercentageText), "%d%%", sfxSlider.value);
+            snprintf(sfxPercentageText, sizeof(sfxPercentageText), "%d%%", sfxSlider.value);
             break;
         }
         case OPTION_BACK: {

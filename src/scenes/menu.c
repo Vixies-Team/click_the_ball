@@ -10,13 +10,11 @@
 
 #include "../ui/label.h"
 
+#include "../effects/fade.h"
+
 #include "gameplay.h"
 
 #define MENU_SIZE 3
-
-static float fadeAlpha = 1.0f;
-static bool is_exit = false;
-static bool is_beginning = true;
 
 static int selected = 0;
 static const char *menuItems[] = {
@@ -25,12 +23,13 @@ static const char *menuItems[] = {
     "Exit"
 };
 
+static fade menuFade;
+
 static UILabel menuLabel[MENU_SIZE];
 static UILabel gameTitleLabel;
 static UILabel hintLabel;
 static UILabel copyrightLabel;
 static UILabel versionlabel;
-
 
 void MenuInit() {
     UILabelInit(&gameTitleLabel, GAME_TITLE, (Vector2){0}, 40, WHITE);
@@ -47,18 +46,12 @@ void MenuInit() {
         UILabelInit(&menuLabel[a], menuItems[a], (Vector2){0}, 30, GRAY);
         menuLabel[a].position = (Vector2){SCREEN_WIDTH/2 - UILabelMeasure(&menuLabel[a]).x / 2, 180 + (a * 50)};
     }
+
+    FadeStart(&menuFade, FADE_IN, 1.0f, BLACK);
 }
 
 void MenuUpdate() {
-    if (is_beginning) {
-        if (fadeAlpha <= 0.0f) is_beginning = false;
-        else fadeAlpha -= 0.02f;
-    }
-    else if (is_exit) {
-        if (fadeAlpha >= 1.0f) running = false;
-        else fadeAlpha += 0.02f;
-    }
-    else {
+    if (!menuFade.active) {
         if (IsKeyPressed(KEY_DOWN)) {
             selected++;
             if (selected >= MENU_SIZE) selected = 0;
@@ -74,7 +67,7 @@ void MenuUpdate() {
             switch(selected) {
                 case 0: {
                     GameplayInit();
-                    ChangeScene(SCENE_GAMEPLAY);
+                    FadeStart(&menuFade, FADE_OUT, 1.0f, BLACK);
                     break;
                 }   
                 case 1: {
@@ -82,11 +75,16 @@ void MenuUpdate() {
                     break;
                 }
                 case 2: {
-                    is_exit = true;
+                    FadeStart(&menuFade, FADE_OUT, 1.0f, BLACK);
                     break;
                 }
             }
         }
+    }
+    
+    if (FadeUpdate(&menuFade) == FADE_EVENT_FINISHED && menuFade.mode == FADE_OUT) {
+        if (selected == 0) ChangeScene(SCENE_GAMEPLAY);
+        else if (selected == 2) running = false;
     }
 }
 void MenuDrawing() {
@@ -102,8 +100,8 @@ void MenuDrawing() {
     UILabelDraw(&hintLabel);
     UILabelDraw(&copyrightLabel);
     UILabelDraw(&versionlabel);
-    
-    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Fade(BLACK, fadeAlpha)); // ini buat fade in/out
+
+    FadeDraw(&menuFade);
 }
 
 void MenuDeinit() {

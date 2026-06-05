@@ -2,69 +2,33 @@
 
 #include "slider.h"
 
-void SliderUpdate(Slider *slider) {
+SliderEvent SliderUpdate(Slider *slider) {
+    SliderEvent retEvent = SLIDER_EVENT_NONE;
     Vector2 mouse = GetMousePosition();
 
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        if (CheckCollisionPointRec(
-            mouse,
-            slider->rect
-        )) {
-            if (slider->onDrag) slider->onDrag(slider->value);
-            slider->dragging = true;
-        }
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mouse, slider->rect)) {
+        retEvent = SLIDER_EVENT_CLICKED;
+        slider->dragging = true;
     }
-
-    if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON) && slider->dragging) {
-        if (slider->onReleased) slider->onReleased(slider->value);
+    else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON) && slider->dragging) {
+        retEvent = SLIDER_EVENT_RELEASED;
         slider->dragging = false;
     }
-
     if (slider->dragging) {
-        float percent =
-            (mouse.x - slider->rect.x) /
-            slider->rect.width;
+        retEvent = SLIDER_EVENT_DRAGGED;
+        float percent = (mouse.x - slider->rect.x) / slider->rect.width;
+        if (percent < 0) percent = 0;
+        if (percent > 1) percent = 1;
 
-        if (percent < 0)
-            percent = 0;
-
-        if (percent > 1)
-            percent = 1;
-
-        slider->value =
-            slider->min +
-            (int)((slider->max - slider->min)
-            * percent);
+        slider->value = slider->min + (int)((slider->max - slider->min) * percent);
     }
+
+    return retEvent;
 }
 
 void SliderDraw(Slider *slider) {
-    float percent =
-        (float)(slider->value - slider->min) /
-        (slider->max - slider->min);
-
-    DrawRectangleRec(
-        slider->rect,
-        DARKGRAY
-    );
-
-    DrawRectangle(
-        slider->rect.x,
-        slider->rect.y,
-        slider->rect.width * percent,
-        slider->rect.height,
-        GREEN
-    );
-
-    DrawCircle(
-        slider->rect.x +
-        (slider->rect.width * percent),
-
-        slider->rect.y +
-        slider->rect.height / 2,
-
-        12,
-
-        WHITE
-    );
+    float percent =(float)(slider->value - slider->min) / (slider->max - slider->min);
+    DrawRectangleRec(slider->rect, DARKGRAY);
+    DrawRectangle(slider->rect.x, slider->rect.y, slider->rect.width * percent, slider->rect.height, GREEN);
+    DrawCircle(slider->rect.x + (slider->rect.width * percent), slider->rect.y + slider->rect.height / 2, 12, WHITE);
 }

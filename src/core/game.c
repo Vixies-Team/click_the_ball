@@ -83,7 +83,6 @@ void ChangeScene(Scene scene) {
 }
 
 void GameDeinit() {
-    
     AudioDeinit();
     IntroDeinit();
     MenuDeinit();

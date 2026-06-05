@@ -5,6 +5,8 @@
 
 void WindowInit(int width, int height, const char *title);
 
+void WindowShake(float intensity, float duration);
+
 void WindowUpdate();
 
 void WindowDeinit();

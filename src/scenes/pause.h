@@ -1,5 +1,5 @@
-#ifndef MENU_H
-#define MENU_H
+#ifndef PAUSE_H
+#define PAUSE_H
 
 #include "../../vendor/raylib/include/raylib.h"
 
@@ -10,4 +10,4 @@ void PauseDrawing();
 
 void PauseDeinit();
 
-#endif // MENU_H
+#endif // PAUSE_H
