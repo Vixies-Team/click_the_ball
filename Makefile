@@ -6,21 +6,8 @@ SRC_DIR = src
 OBJ_DIR = obj
 VENDOR_DIR = vendor
 
-CFLAGS = \
-	-Wall \
-	-Wextra \
-	-std=c99 \
-	-O2 \
-	-march=native \
-	-flto \
-	-ffast-math
-
 INCLUDES = \
 	-Ivendor/raylib/include
-
-LDFLAGS = \
-	-Lvendor/raylib/lib \
-	-flto
 
 LIBS = \
 	-lraylib \
@@ -29,12 +16,18 @@ LIBS = \
 	-ldl \
 	-lX11
 
-SRC = $(shell find $(SRC_DIR) -name "*.c")
-VENDOR_SRC = $(shell find $(VENDOR_DIR) -name "*.c")
+RELEASE_CFLAGS = \
+	-Wall \
+	-Wextra \
+	-std=c99 \
+	-O2 \
+	-march=native \
+	-flto \
+	-ffast-math
 
-OBJ = \
-	$(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC)) \
-	$(patsubst $(VENDOR_DIR)/%.c,$(OBJ_DIR)/vendor/%.o,$(VENDOR_SRC))
+RELEASE_LDFLAGS = \
+	-Lvendor/raylib/lib \
+	-flto
 
 DEBUG_CFLAGS = \
 	-Wall \
@@ -46,8 +39,26 @@ DEBUG_CFLAGS = \
 	-fsanitize=undefined
 
 DEBUG_LDFLAGS = \
+	-Lvendor/raylib/lib \
 	-fsanitize=address \
 	-fsanitize=undefined
+
+SRC = $(shell find $(SRC_DIR) -name "*.c")
+VENDOR_SRC = $(shell find $(VENDOR_DIR) -name "*.c")
+
+OBJ = \
+	$(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC)) \
+	$(patsubst $(VENDOR_DIR)/%.c,$(OBJ_DIR)/vendor/%.o,$(VENDOR_SRC))
+
+# Default = release
+all: release
+
+release: CFLAGS=$(RELEASE_CFLAGS)
+release: LDFLAGS=$(RELEASE_LDFLAGS)
+release: $(TARGET)
+
+release-run: release
+	./$(TARGET)
 
 debug: CFLAGS=$(DEBUG_CFLAGS)
 debug: LDFLAGS=$(DEBUG_LDFLAGS)
@@ -55,8 +66,6 @@ debug: clean $(TARGET)
 
 debug-run: debug
 	ulimit -c unlimited && ./$(TARGET)
-
-all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	$(CC) $(OBJ) -o $(TARGET) $(LDFLAGS) $(LIBS)
@@ -70,10 +79,7 @@ $(OBJ_DIR)/vendor/%.o: $(VENDOR_DIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-run: all
-	./$(TARGET)
-
 clean:
-	rm -rf $(OBJ_DIR) game data.vxpck
+	rm -rf $(OBJ_DIR) $(TARGET) data.vxpck
 
-rebuild: clean all
+rebuild: clean release

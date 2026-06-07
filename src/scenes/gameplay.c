@@ -46,8 +46,8 @@ void GameplayInit() {
     snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
     snprintf(highScoreText, sizeof(highScoreText), "High Score: %d", highScore);
 
-    UILabelInit(&scoreLabel, scoreText, (Vector2){20, 20}, 20, WHITE);
-    UILabelInit(&highScoreLabel, highScoreText, (Vector2){0, 0}, 20, WHITE);
+    UILabelInit(&scoreLabel, scoreText, UI_LABEL_TYPE_NORMAL, (Vector2){20, 20}, 20, WHITE, 0.0f);
+    UILabelInit(&highScoreLabel, highScoreText, UI_LABEL_TYPE_NORMAL, (Vector2){0, 0}, 20, WHITE, 0.0f);
     highScoreLabel.position = (Vector2){SCREEN_WIDTH - UILabelMeasure(&highScoreLabel).x - 20, 20};
 
     is_paused = false;

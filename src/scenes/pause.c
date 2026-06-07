@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include "../../vendor/raylib/include/raylib.h"
 
 #include "pause.h"
@@ -19,6 +20,7 @@
 #include "../scenes/options.h"
 
 #define MENU_SIZE 3
+
 static int selected = 0;
 static const char *menuItems[] = {
     "Resume Game",
@@ -34,12 +36,14 @@ static fade pauseFade;
 void PauseInit() {
     FadeInit(&pauseFade);
 
-    UILabelInit(&titlelabel, "GAME PAUSED", (Vector2){0, 0}, 40, WHITE);
+    UILabelInit(&titlelabel, "GAME PAUSED", UI_LABEL_TYPE_NORMAL, (Vector2){0, 0}, 40, WHITE, 0.0f);
     titlelabel.position = (Vector2){SCREEN_WIDTH / 2 - UILabelMeasure(&titlelabel).x / 2, 80};
     for (int a = 0; a < MENU_SIZE; a++) {
-        UILabelInit(&menuLabel[a], menuItems[a], (Vector2){0, 0}, 30, WHITE);
+        UILabelInit(&menuLabel[a], menuItems[a], UI_LABEL_TYPE_NORMAL, (Vector2){0, 0}, 30, WHITE, 0.0f);
         menuLabel[a].position = (Vector2){SCREEN_WIDTH / 2 - UILabelMeasure(&menuLabel[a]).x / 2, 180 + (a * 50)};
     }
+
+    SetMusicVolume(songMusic, GetMusicVolume() / 2.0f);
 }
 
 void PauseUpdate() {
@@ -59,6 +63,7 @@ void PauseUpdate() {
             switch(selected) {
                 case 0: {
                     is_paused = false;
+                    PauseDeinit();
                     break;
                 }   
                 case 1: {
@@ -66,7 +71,7 @@ void PauseUpdate() {
                     break;
                 }
                 case 2: {
-                    AudioFadeStart(&musicFade, AUDIO_FADE_OUT, 1.5f, GetMusicVolume(), 0.0f);
+                    AudioFadeStart(&musicFade, AUDIO_FADE_OUT, 1.5f, GetMusicVolume() / 2.0f, 0.0f);
                     FadeStart(&pauseFade, FADE_OUT, 1.5f, BLACK);
                     break;
                 }
@@ -99,5 +104,6 @@ void PauseDrawing() {
 }
 
 void PauseDeinit() {
+    SetMusicVolume(songMusic, GetMusicVolume());
     selected = 0;
 }

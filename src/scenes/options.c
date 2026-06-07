@@ -13,8 +13,10 @@
 
 #include "gameplay.h"
 
-static Slider musicSlider;
-static Slider sfxSlider;
+static bool is_already_init = false;
+
+static UISlider musicSlider;
+static UISlider sfxSlider;
 
 static UILabel optionsLabel;
 static UILabel musicLabel;
@@ -39,29 +41,33 @@ void SetSFXVolume(float value) {
 }
 
 void OptionsInit() {
-    musicSlider = (Slider){
-        .rect = { 60, 140, 250, 20 },
-        .min = 0,
-        .max = 100,
-        .value = 100
-    };
+    if (!is_already_init) {
+        is_already_init = true;
 
-    sfxSlider = (Slider){
-        .rect = { 60, 240, 250, 20 },
-        .min = 0,
-        .max = 100,
-        .value = 100,
-    };
+        musicSlider = (UISlider){
+            .rect = { 60, 140, 250, 20 },
+            .min = 0,
+            .max = 100,
+            .value = 100
+        };
 
-    UILabelInit(&optionsLabel, "OPTIONS", (Vector2){60, 40}, 40, WHITE);
-    UILabelInit(&musicLabel, "Music", (Vector2){60, 100}, 30, WHITE);
-    UILabelInit(&musicPercentageLabel, musicPercentageText, (Vector2){330, 132}, 20, GRAY);
-    UILabelInit(&sfxLabel, "SFX", (Vector2){60, 200}, 30, WHITE);
-    UILabelInit(&sfxPercentageLabel, sfxPercentageText, (Vector2){330, 232}, 20, GRAY);
-    UILabelInit(&backLabel, "Back", (Vector2){60, 340}, 30, WHITE);
+        sfxSlider = (UISlider){
+            .rect = { 60, 240, 250, 20 },
+            .min = 0,
+            .max = 100,
+            .value = 100,
+        };
 
-    snprintf(musicPercentageText, sizeof(musicPercentageText), "%d%%", musicSlider.value);
-    snprintf(sfxPercentageText, sizeof(musicPercentageText), "%d%%", sfxSlider.value);
+        UILabelInit(&optionsLabel, "OPTIONS", UI_LABEL_TYPE_NORMAL, (Vector2){60, 40}, 40, WHITE, 0.0f);
+        UILabelInit(&musicLabel, "Music", UI_LABEL_TYPE_NORMAL, (Vector2){60, 100}, 30, WHITE, 0.0f);
+        UILabelInit(&musicPercentageLabel, musicPercentageText, UI_LABEL_TYPE_NORMAL, (Vector2){330, 132}, 20, GRAY, 0.0f);
+        UILabelInit(&sfxLabel, "SFX", UI_LABEL_TYPE_NORMAL, (Vector2){60, 200}, 30, WHITE, 0.0f);
+        UILabelInit(&sfxPercentageLabel, sfxPercentageText, UI_LABEL_TYPE_NORMAL, (Vector2){330, 232}, 20, GRAY, 0.0f);
+        UILabelInit(&backLabel, "Back", UI_LABEL_TYPE_NORMAL, (Vector2){60, 340}, 30, WHITE, 0.0f);
+
+        snprintf(musicPercentageText, sizeof(musicPercentageText), "%d%%", musicSlider.value);
+        snprintf(sfxPercentageText, sizeof(musicPercentageText), "%d%%", sfxSlider.value);
+    }
 }
 
 void BackScene() {
@@ -113,23 +119,26 @@ void OptionsUpdate() {
             if (IsKeyDown(KEY_RIGHT)) {
                 musicSlider.value++;
                 if (musicSlider.value > musicSlider.max) musicSlider.value = musicSlider.max;
+                snprintf(musicPercentageText, sizeof(musicPercentageText), "%d%%", musicSlider.value);
+                SetMusicVolume(songMusic, (musicSlider.value / 100.0f) / (is_paused ? 2.0f : 1.0f));
             } else if (IsKeyDown(KEY_LEFT)) {
                 musicSlider.value--;
                 if (musicSlider.value < musicSlider.min) musicSlider.value = musicSlider.min;
+                snprintf(musicPercentageText, sizeof(musicPercentageText), "%d%%", musicSlider.value);
+                SetMusicVolume(songMusic, (musicSlider.value / 100.0f) / (is_paused ? 2.0f : 1.0f));
             }
-            snprintf(musicPercentageText, sizeof(musicPercentageText), "%d%%", musicSlider.value);
-            SetMusicVolume(songMusic, musicSlider.value / 100.0f);
             break;
         }
         case OPTION_SFX: {
             if (IsKeyDown(KEY_RIGHT)) {
                 sfxSlider.value++;
                 if (sfxSlider.value > sfxSlider.max) sfxSlider.value = sfxSlider.max;
+                snprintf(sfxPercentageText, sizeof(sfxPercentageText), "%d%%", sfxSlider.value);
             } else if (IsKeyDown(KEY_LEFT)) {
                 sfxSlider.value--;
                 if (sfxSlider.value < sfxSlider.min) sfxSlider.value = sfxSlider.min;
+                snprintf(sfxPercentageText, sizeof(sfxPercentageText), "%d%%", sfxSlider.value);
             } else if (IsKeyReleased(KEY_LEFT) || IsKeyReleased(KEY_RIGHT)) SetSFXVolume(sfxSlider.value);
-            snprintf(sfxPercentageText, sizeof(sfxPercentageText), "%d%%", sfxSlider.value);
             break;
         }
         case OPTION_BACK: {

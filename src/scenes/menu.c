@@ -34,18 +34,18 @@ static UILabel copyrightLabel;
 static UILabel versionlabel;
 
 void MenuInit() {
-    UILabelInit(&gameTitleLabel, GAME_TITLE, (Vector2){0}, 40, WHITE);
+    UILabelInit(&gameTitleLabel, GAME_TITLE, UI_LABEL_TYPE_NORMAL, (Vector2){0}, 40, WHITE, 0.0f);
     gameTitleLabel.position = (Vector2){SCREEN_WIDTH/2 - UILabelMeasure(&gameTitleLabel).x / 2, 80};
 
-    UILabelInit(&hintLabel, "Use Arrow Keys + ENTER", (Vector2){0}, 20, WHITE);
+    UILabelInit(&hintLabel, "Use Arrow Keys + ENTER", UI_LABEL_TYPE_NORMAL, (Vector2){0}, 20, WHITE, 0.0f);
     hintLabel.position = (Vector2){SCREEN_WIDTH/2 - UILabelMeasure(&hintLabel).x / 2, 350};
     
-    UILabelInit(&copyrightLabel, "© 2026 Vixies Studio", (Vector2){10, SCREEN_HEIGHT - 35}, 24, GRAY);
-    UILabelInit(&versionlabel, "Version 0.1", (Vector2){0}, 24, GRAY);
+    UILabelInit(&copyrightLabel, "© 2026 Vixies Studio", UI_LABEL_TYPE_NORMAL, (Vector2){10, SCREEN_HEIGHT - 35}, 24, GRAY, 0.0f);
+    UILabelInit(&versionlabel, "Version 0.1", UI_LABEL_TYPE_NORMAL, (Vector2){0}, 24, GRAY, 0.0f);
     versionlabel.position = (Vector2){SCREEN_WIDTH - UILabelMeasure(&versionlabel).x - 10, SCREEN_HEIGHT - 35};
 
     for (int a = 0; a < MENU_SIZE; a++) {
-        UILabelInit(&menuLabel[a], menuItems[a], (Vector2){0}, 30, GRAY);
+        UILabelInit(&menuLabel[a], menuItems[a], UI_LABEL_TYPE_NORMAL, (Vector2){0}, 30, GRAY, 0.0f);
         menuLabel[a].position = (Vector2){SCREEN_WIDTH/2 - UILabelMeasure(&menuLabel[a]).x / 2, 180 + (a * 50)};
     }
 

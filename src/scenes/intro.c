@@ -5,6 +5,8 @@
 
 #include "intro.h"
 
+#include "../audio/audio.h"
+
 #include "../core/config.h"
 #include "../core/game.h"
 
@@ -12,54 +14,55 @@
 
 #include "../effects/fade.h"
 
-static const char *title = "Vixies Studio";
+#include "../utils/timer.h"
 
-static int textLength = 13;
-
-static int visibleChars = 0;
-static int frameCounter = 0;
-
-static int waitTimer = 0;
+#include <stdlib.h>
 
 static fade introFade;
 
 static UILabel titleLabel;
 static UILabel presentLabel;
 
+static Timer presentTimer;
+static Timer fadeTimer;
+
 void IntroInit() {
     FadeInit(&introFade);
-    
-    UILabelInit(&titleLabel, title, (Vector2){0}, 50, WHITE);
-    UILabelInit(&presentLabel, "Present", (Vector2){0}, 25, (Color){180, 180, 180, 0});
+
+    TimerInit(&presentTimer, 1.0f);
+    TimerInit(&fadeTimer, 2.0f);
+
+    UILabelInit(&titleLabel, "Vixies Studio", UI_LABEL_TYPE_SUBTEXT, (Vector2){0}, 50, WHITE, 0.1f);
+    UILabelInit(&presentLabel, "Present", UI_LABEL_TYPE_NORMAL, (Vector2){0}, 25, (Color){180, 180, 180, 0}, 0.0f);
     
     titleLabel.position = (Vector2){(SCREEN_WIDTH / 2) - (UILabelMeasure(&titleLabel).x / 2), (SCREEN_HEIGHT / 2) - 30};
     presentLabel.position = (Vector2){(SCREEN_WIDTH / 2) - (UILabelMeasure(&presentLabel).x / 2), (SCREEN_HEIGHT / 2) + 35};
-    titleLabel.text = "";
+
     presentLabel.alpha = 0.0f;
 }
 
 void IntroUpdate() {
-    frameCounter++;
-
     if (IsKeyPressed(KEY_ENTER) && !introFade.active) FadeStart(&introFade, FADE_OUT, 1.0f, BLACK);
 
-    if (frameCounter >= 10) {
-        frameCounter = 0;
-        if (visibleChars < textLength) {
-            visibleChars++;
-            titleLabel.text = TextSubtext(title, 0, visibleChars);
+    switch(UILabelUpdate(&titleLabel, GetFrameTime())) {
+        case UI_LABEL_EVENT_NONE: break;
+        case UI_LABEL_EVENT_TYPING: {
+            SetSoundPitch(talkingSfx, GetRandomValue(45, 55) / 100.0f);
+            PlaySound(talkingSfx);
+            break;
+        }
+        case UI_LABEL_EVENT_DONE: {
+            TimerStart(&presentTimer);
+            break;
         }
     }
 
-    if (visibleChars >= textLength) {
-        if (presentLabel.alpha <= 1.0f) presentLabel.alpha += 0.02f;
-        else {
-            if (waitTimer >= 180) {
-                if (!introFade.active) FadeStart(&introFade, FADE_OUT, 1.0f, BLACK);
-            }
-            else waitTimer++;
-        }
+    if (TimerUpdate(&presentTimer, GetFrameTime()) == TIMER_EVENT_FINISHED) {
+        TimerStart(&fadeTimer);
+        presentLabel.alpha = 1.0f;
+        PlaySound(selectSfx);
     }
+    if (TimerUpdate(&fadeTimer, GetFrameTime())) FadeStart(&introFade, FADE_OUT, 1.0f, BLACK);
 
     switch(FadeUpdate(&introFade)) {
         case FADE_EVENT_FINISHED: {
@@ -71,10 +74,10 @@ void IntroUpdate() {
 }
 void IntroDrawing() {
     ClearBackground(BLACK);
-
+    
     UILabelDraw(&titleLabel);
     UILabelDraw(&presentLabel);
-
+    
     FadeDraw(&introFade);
 }
 

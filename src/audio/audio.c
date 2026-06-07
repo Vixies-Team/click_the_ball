@@ -8,6 +8,7 @@
 Sound selectSfx;
 Sound menuSfx;
 Sound shootSfx;
+Sound talkingSfx;
 
 static uint32_t songBufferSize;
 static void* songBuffer;
@@ -19,6 +20,7 @@ void AudioInit() {
     selectSfx = Assets_LoadSound("sfx/select.wav");
     menuSfx = Assets_LoadSound("sfx/menu.wav");
     shootSfx = Assets_LoadSound("sfx/shoot.wav");
+    talkingSfx = Assets_LoadSound("sfx/talking.wav");
 
     songBuffer = Assets_LoadFile("music/killer_trip.ogg", &songBufferSize);
     songMusic = LoadMusicStreamFromMemory(GetFileExtension("music/killer_trip.ogg"), songBuffer, songBufferSize);
@@ -32,6 +34,7 @@ void AudioDeinit() {
     UnloadSound(selectSfx);
     UnloadSound(menuSfx);
     UnloadSound(shootSfx);
+    UnloadSound(talkingSfx);
 
     UnloadMusicStream(songMusic);
 

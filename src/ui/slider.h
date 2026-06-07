@@ -8,9 +8,9 @@ typedef enum {
     SLIDER_EVENT_CLICKED,
     SLIDER_EVENT_DRAGGED,
     SLIDER_EVENT_RELEASED
-} SliderEvent;
+} UISliderEvent;
 
-typedef void (*SliderCallback)(float value);
+typedef void (*UISliderCallback)(float value);
 typedef struct {
     Rectangle rect;
 
@@ -19,9 +19,9 @@ typedef struct {
     int value;
 
     bool dragging;
-} Slider;
+} UISlider;
 
-SliderEvent SliderUpdate(Slider *slider);
-void SliderDraw(Slider *slider);
+UISliderEvent SliderUpdate(UISlider *slider);
+void SliderDraw(UISlider *slider);
 
 #endif
