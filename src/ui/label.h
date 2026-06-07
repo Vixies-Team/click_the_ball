@@ -8,6 +8,7 @@ typedef struct {
     float elapsed_per_char;
 
     int text_visible;
+    char char_show;
 
     bool active;
 } UILabelSubtext;

@@ -32,7 +32,7 @@ void IntroInit() {
     TimerInit(&presentTimer, 1.0f);
     TimerInit(&fadeTimer, 2.0f);
 
-    UILabelInit(&titleLabel, "Vixies Studio", UI_LABEL_TYPE_SUBTEXT, (Vector2){0}, 50, WHITE, 0.1f);
+    UILabelInit(&titleLabel, "Vixies Studio", UI_LABEL_TYPE_SUBTEXT, (Vector2){0}, 50, WHITE, 0.15f);
     UILabelInit(&presentLabel, "Present", UI_LABEL_TYPE_NORMAL, (Vector2){0}, 25, (Color){180, 180, 180, 0}, 0.0f);
     
     titleLabel.position = (Vector2){(SCREEN_WIDTH / 2) - (UILabelMeasure(&titleLabel).x / 2), (SCREEN_HEIGHT / 2) - 30};
@@ -47,8 +47,10 @@ void IntroUpdate() {
     switch(UILabelUpdate(&titleLabel, GetFrameTime())) {
         case UI_LABEL_EVENT_NONE: break;
         case UI_LABEL_EVENT_TYPING: {
-            SetSoundPitch(talkingSfx, GetRandomValue(45, 55) / 100.0f);
-            PlaySound(talkingSfx);
+            if (titleLabel.subtext.char_show != ' ') {
+                SetSoundPitch(talkingSfx, GetRandomValue(45, 55) / 100.0f);
+                PlaySound(talkingSfx);
+            }
             break;
         }
         case UI_LABEL_EVENT_DONE: {

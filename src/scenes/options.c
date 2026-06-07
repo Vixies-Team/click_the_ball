@@ -82,7 +82,7 @@ void OptionsUpdate() {
         case SLIDER_EVENT_NONE: break;
         case SLIDER_EVENT_CLICKED: break;
         case SLIDER_EVENT_DRAGGED: {
-            SetMusicVolume(songMusic, musicSlider.value / 100.0f);
+            SetMusicVolume(songMusic, (musicSlider.value / 100.0f) / (is_paused ? 2.0f : 1.0f));
             snprintf(musicPercentageText, sizeof(musicPercentageText), "%d%%", musicSlider.value);
             break;
         };

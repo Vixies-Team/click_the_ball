@@ -42,6 +42,7 @@ UILabelEvent UILabelUpdate(UILabel* label, float deltaTime) {
                     label->subtext.active = false;
                     return UI_LABEL_EVENT_DONE;
                 }
+                label->subtext.char_show = *(label->text + label->subtext.text_visible);
                 label->subtext.text_visible++;
                 label->subtext.elapsed_per_char = 0.0f;
                 return UI_LABEL_EVENT_TYPING;
