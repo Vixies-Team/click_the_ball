@@ -8,6 +8,8 @@ void FadeInit(fade* fades) {
 }
 
 void FadeStart(fade* fade, fadeMode mode, float duration, Color color) {
+    if (fade->active) return;
+    
     fade->mode = mode;
     fade->duration = duration;
     fade->timer = 0.0f;

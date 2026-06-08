@@ -64,7 +64,7 @@ void IntroUpdate() {
         presentLabel.alpha = 1.0f;
         PlaySound(selectSfx);
     }
-    if (TimerUpdate(&fadeTimer, GetFrameTime())) FadeStart(&introFade, FADE_OUT, 1.0f, BLACK);
+    if (TimerUpdate(&fadeTimer, GetFrameTime()) == TIMER_EVENT_FINISHED) FadeStart(&introFade, FADE_OUT, 1.0f, BLACK);
 
     switch(FadeUpdate(&introFade)) {
         case FADE_EVENT_FINISHED: {

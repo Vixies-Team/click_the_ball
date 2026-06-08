@@ -55,7 +55,7 @@ UILabelEvent UILabelUpdate(UILabel* label, float deltaTime) {
 
 void UILabelDraw(UILabel* label) {
     if (!label || !label->text) return;
-
+    
     DrawTextEx(
         label->font ? *label->font : GetFontDefault(),
         label->type == UI_LABEL_TYPE_NORMAL ? label->text : TextSubtext(label->text, 0, label->subtext.text_visible),
